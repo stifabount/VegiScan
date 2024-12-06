@@ -1,0 +1,3 @@
+@hapi/hapi
+axios
+form-data

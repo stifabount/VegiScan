@@ -1,0 +1,22 @@
+{
+  "name": "latihan-implementasi-aplikasi-machine-learning-google-cloud",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ./src/services/loadModel.js",
+    "start:dev": "nodemon ./src/server/server.js",
+    "start": "node ./src/server/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@hapi/hapi": "^21.3.12",
+    "axios": "^1.7.9",
+    "form-data": "^4.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
