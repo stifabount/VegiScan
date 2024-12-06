@@ -1,2 +1,3 @@
 runtime: python312
-entrypoint: python3 script/script.py
+entrypoint: gunicorn -b :$PORT script.script:app
+service: python-backend
