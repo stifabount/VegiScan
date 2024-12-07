@@ -1,0 +1,9 @@
+.list {
+    display: inline-block; /* Keep divs inline */
+    margin: 10px;
+    background-color: lightgreen;
+    justify-content: center; /* Center horizontally */
+    align-items: center;    /* Center vertically */
+    text-align: center;
+    border-style: solid;
+}

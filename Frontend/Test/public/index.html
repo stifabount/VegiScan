@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Submission</title>
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
+    <h1>Submit an Image</h1>
+    <form id="imageForm" action="http://localhost:5000/predict" method="POST" enctype="multipart/form-data">
+        <label for="image">Choose an image:</label>
+        <input type="file" id="image" name="image" accept="image/*" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id = "imageGallery" ></div>
+    <p id="responseMessage"></p>
+
+    <script>
+        const form = document.getElementById('imageForm');
+        const responseMessage = document.getElementById('responseMessage');
+        const imageGallery = document.getElementById("imageGallery");
+        async function display(){
+            let jsonData = await fetch("http://localhost:5000/predict/histories", {
+                method: "GET",
+            })
+            
+            output = await jsonData.json();
+            console.log(output);
+            output.data.forEach(item => {
+                // const image = document.createElement("img");
+    
+                // image.src = item.link; 
+                const output = document.createElement("img");
+                const desc = document.createElement("p");
+                const temp = document.createElement("div");
+                temp.className = "list";
+                desc.innerHTML = item.history.label;
+                output.src = item.history.link;
+                output.height = 100;
+                temp.appendChild(output);
+                temp.appendChild(desc);
+                imageGallery.appendChild(temp);
+                //imageGallery.appendChild(item.link);
+            });
+        }
+
+        function addDisplay(link, label){
+            // const image = document.createElement("img");
+    
+            // image.src = link;
+            const output = document.createElement("img");
+            const desc = document.createElement("p");
+            const temp = document.createElement("div");
+            temp.className = "list";
+            desc.innerHTML = label;
+            output.src = link;
+            output.height = 100;
+            temp.appendChild(output);
+            temp.appendChild(desc);
+            imageGallery.appendChild(temp);
+            
+        }
+
+        display();
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const output = await response.json();
+                
+                const { label } = output.data;
+                addDisplay(output.data.link, label);
+                // responseMessage.textContent = label;
+
+            } catch (error) {
+                responseMessage.textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
