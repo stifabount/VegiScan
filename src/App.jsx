@@ -12,7 +12,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/vegetables" element={<Vegetables />} />
+        <Route path="/vegetables" element={<Vegetables initial={null}/>} />
         <Route path="/scanpage" element={<HeroScan />} />
       </Routes>
       <Footer />

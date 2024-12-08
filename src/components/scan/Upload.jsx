@@ -1,36 +1,85 @@
 import React, { useState } from "react";
+import Vegetables from "../../Pages/VegetablesPage";
 
-const UploadPopup = ({ isOpen, onClose }) => {
+const UploadPopup = ({ isOpen, onClose, uploaded }) => {
   const [image, setImage] = useState(null);
+  const [file, setFile] = useState(null);  // For the actual file to upload
 
+  const [link, setLink] = useState(null);
+  const [label, setLabel] = useState(null);
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file && file.type.startsWith("image/")) {
+    const uploadedFile = event.target.files[0];
+    if (uploadedFile && uploadedFile.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setImage(e.target.result); // Menyimpan data URL gambar
+        setImage(e.target.result); // Set preview URL
       };
-      reader.readAsDataURL(file);
+      setFile(uploadedFile); // Save file for later upload
+      reader.readAsDataURL(uploadedFile);
     }
   };
 
   const handleDragOver = (event) => {
-    event.preventDefault(); // Menghindari perilaku default browser
+    event.preventDefault();
   };
 
   const handleDrop = (event) => {
     event.preventDefault();
-    const file = event.dataTransfer.files[0];
-    if (file && file.type.startsWith("image/")) {
+    const uploadedFile = event.dataTransfer.files[0];
+    if (uploadedFile && uploadedFile.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setImage(e.target.result); // Menyimpan data URL gambar
+        setImage(e.target.result); // Set preview URL
       };
-      reader.readAsDataURL(file);
+      setFile(uploadedFile); // Save file for later upload
+      reader.readAsDataURL(uploadedFile);
     }
   };
 
+  const handleSubmit = async () => {
+    if (!file) {
+      alert("Please upload an image before submitting.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", file, file.name);
+
+    try {
+      const response = await fetch(
+        "https://javascript-backend-623812248472.asia-southeast2.run.app/predict",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to upload image");
+      }
+
+      const result = await response.json();
+      console.log("Image uploaded successfully:", result);
+      alert("Image uploaded successfully!");
+      setLink(result.data.link);
+      setLabel(result.data.label);
+      onClose({
+        label: result.data.label,
+        link: result.data.link,
+        details: result.data.details
+      }); // Close the popup after submission
+
+    
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("Error uploading image.");
+    }
+
+    
+  };
+
   if (!isOpen) return null;
+
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -64,7 +113,7 @@ const UploadPopup = ({ isOpen, onClose }) => {
         </div>
         <button
           className="w-full bg-primary-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-primary-600"
-          onClick={onClose}
+          onClick={handleSubmit}
         >
           Submit
         </button>
