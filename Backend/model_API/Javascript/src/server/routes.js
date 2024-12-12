@@ -1,3 +1,4 @@
+const { Stream } = require('form-data');
 const {postPredictHandler, getFirestoreData} = require('./handler');
  
 const routes = [
@@ -7,19 +8,21 @@ const routes = [
     handler: postPredictHandler,
     options: {
       payload: {
+        output: "stream",
+        parse: true,       // Parse payload to extract the file
         /*Mengizinkan data berupa gambar*/
-        allow: 'multipart/form-data',
         multipart: true,
-        maxBytes: 1000000 
+        maxBytes: 1000000,
+        // allow: ['multipart/form-data'],
       }
     }
-  }
+  },
 
-  // {
-  //   path: '/predict/histories',
-  //   method: 'GET',
-  //   handler: getFirestoreData
-  // }
+  {
+    path: '/predict/histories',
+    method: 'GET',
+    handler: getFirestoreData
+  },
 ]
  
 module.exports = routes;

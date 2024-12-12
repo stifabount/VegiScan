@@ -1,10 +1,18 @@
 const axios = require('axios');
 const FormData = require('form-data');
 const crypto = require('crypto');
+const storeData = require("../services/storeData");
+const getAllDocuments = require("../services/getData");
+const { getImageLink } = require("../services/getImageLink");
 
 async function postPredictHandler(request, h) {
   const { image } = request.payload;
- 
+
+  // console.dir(request.payload);
+  file = request.payload.image;
+  // console.log(file.hapi.filename);
+  // console.log(file.hapi.headers);
+
   const id = crypto.randomUUID();
   const createdAt = new Date().toISOString();
   const formData = new FormData();
@@ -12,7 +20,7 @@ async function postPredictHandler(request, h) {
   let output;
 
   try {
-    const response = await axios.post('http://127.0.0.1:5000/predict', formData, {
+    const response = await axios.post('https://python-backend-623812248472.asia-southeast2.run.app/predict', formData, {
       headers: formData.getHeaders(),  // Automatically sets the correct Content-Type for multipart/form-data
     });
 
@@ -26,13 +34,15 @@ async function postPredictHandler(request, h) {
   } 
   
 
+  const link = await getImageLink(image, id);
   const data = {
     "id": id,
     "label": output,
+    "link": link,
     "createdAt": createdAt
   }
 
-  // await storeData(id, data);
+  await storeData(id, data);
   const response = h.response({
     status: 'success',
     message: 'Model is predicted successfully',
@@ -42,14 +52,14 @@ async function postPredictHandler(request, h) {
   return response;
 }
 
-// async function getFirestoreData(request, h) {
-//   const data = await getAllDocuments();
-//   const response = h.response({
-//     "status": "success",
-//     "data": data 
-//   })
-//   response.code(200);
-//   return response;
-// }
+async function getFirestoreData(request, h) {
+  const data = await getAllDocuments();
+  const response = h.response({
+    "status": "success",
+    "data": data 
+  })
+  response.code(200);
+  return response;
+}
 
-module.exports = {postPredictHandler};
+module.exports = {postPredictHandler, getFirestoreData};
